@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecuador: La Realidad del Trabajo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --bg3: #161616;
+    --border: #222;
+    --text: #e8e8e8;
+    --muted: #666;
+    --accent: #f5a623;
+    --accent2: #e8392a;
+    --accent3: #4ecdc4;
+    --accent4: #a8e063;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 2.5rem;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+  }
+  nav .fuente {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 8rem 2.5rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(245,166,35,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    max-width: 900px;
+    color: var(--white);
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    margin-top: 2rem;
+    max-width: 520px;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #999;
+  }
+  .hero-stats {
+    display: flex; gap: 3rem;
+    margin-top: 3.5rem;
+    flex-wrap: wrap;
+  }
+  .stat-item { display: flex; flex-direction: column; gap: 0.3rem; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .stat-num.red { color: var(--accent2); }
+  .stat-num.teal { color: var(--accent3); }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    max-width: 140px;
+    line-height: 1.4;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 2.5rem; left: 2.5rem;
+    display: flex; align-items: center; gap: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .scroll-hint::before {
+    content: '';
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--muted));
+  }
+
+  /* ── SECCIONES ── */
+  section {
+    padding: 6rem 2.5rem;
+    border-top: 1px solid var(--border);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: 0.03em;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.8rem;
+  }
+  .section-desc {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #888;
+    max-width: 560px;
+    margin-bottom: 3rem;
+  }
+
+  /* ── CHART WRAPPERS ── */
+  .chart-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 2rem;
+    position: relative;
+  }
+  .chart-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  canvas { display: block; width: 100% !important; }
+
+  /* ── GRID LAYOUTS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ── BRECHA CARDS ── */
+  .brecha-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .brecha-card {
+    background: var(--bg2);
+    padding: 2rem 1.5rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .brecha-card .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    line-height: 1;
+  }
+  .brecha-card .lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .brecha-card .sub {
+    font-size: 0.78rem;
+    color: #666;
+    margin-top: 0.3rem;
+    line-height: 1.5;
+  }
+
+  /* ── CIUDAD BARS ── */
+  .ciudad-bar-wrap { display: flex; flex-direction: column; gap: 1rem; }
+  .ciudad-row { display: flex; align-items: center; gap: 1rem; }
+  .ciudad-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    width: 80px; flex-shrink: 0;
+  }
+  .ciudad-bar-bg {
+    flex: 1; height: 28px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .ciudad-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+  }
+  .ciudad-bar-fill.high { background: var(--accent2); }
+  .ciudad-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    color: var(--white);
+    width: 40px; text-align: right; flex-shrink: 0;
+  }
+
+  /* ── SECTORIZACION ── */
+  .sector-donut-wrap {
+    display: flex; align-items: center; gap: 3rem; flex-wrap: wrap;
+  }
+  .sector-legend { display: flex; flex-direction: column; gap: 1rem; flex: 1; min-width: 180px; }
+  .legend-row { display: flex; align-items: center; gap: 0.8rem; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-text { font-size: 0.82rem; color: #aaa; }
+  .legend-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-left: auto;
+  }
+
+  /* ── INSIGHT BOX ── */
+  .insight {
+    border-left: 2px solid var(--accent);
+    padding: 1.2rem 1.5rem;
+    background: rgba(245,166,35,0.04);
+    margin-top: 2rem;
+  }
+  .insight p {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: #999;
+  }
+  .insight strong { color: var(--accent); font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  footer .credits { font-size: 0.75rem; color: var(--muted); line-height: 1.8; }
+  footer .credits strong { color: var(--text); font-weight: 400; }
+
+  /* ── FADE IN ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── TICKER LINE ── */
+  .ticker-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 0.6rem 0;
+    margin-bottom: 0;
+  }
+  .ticker {
+    display: flex; gap: 4rem;
+    animation: ticker 30s linear infinite;
+    white-space: nowrap;
+  }
+  .ticker span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .ticker span em { color: var(--accent); font-style: normal; }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Ecuador · Mercado Laboral</div>
+  <div class="fuente">Fuente: ENEMDU · INEC · I-2026</div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap" style="margin-top:56px">
+  <div class="ticker">
+    <span>Desempleo nacional <em>3.4%</em></span>
+    <span>Sector informal <em>53.5%</em></span>
+    <span>Empleo adecuado <em>35.7%</em></span>
+    <span>Subempleo <em>18.4%</em></span>
+    <span>Desempleo mujeres <em>4.6%</em></span>
+    <span>Desempleo hombres <em>2.6%</em></span>
+    <span>Desempleo jóvenes 15-24 <em>9.5%</em></span>
+    <span>Desempleo Quito <em>8.9%</em></span>
+    <span>Desempleo Guayaquil <em>2.3%</em></span>
+    <!-- duplicate for seamless loop -->
+    <span>Desempleo nacional <em>3.4%</em></span>
+    <span>Sector informal <em>53.5%</em></span>
+    <span>Empleo adecuado <em>35.7%</em></span>
+    <span>Subempleo <em>18.4%</em></span>
+    <span>Desempleo mujeres <em>4.6%</em></span>
+    <span>Desempleo hombres <em>2.6%</em></span>
+    <span>Desempleo jóvenes 15-24 <em>9.5%</em></span>
+    <span>Desempleo Quito <em>8.9%</em></span>
+    <span>Desempleo Guayaquil <em>2.3%</em></span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Realidad socioeconómica · Ecuador 2020—2026</div>
+  <h1>El trabajo<br>en <span>Ecuador</span><br>no alcanza</h1>
+  <p class="hero-sub">Más de la mitad de los trabajadores ecuatorianos opera en el sector informal. Solo 1 de cada 3 tiene empleo adecuado. Estos son los datos reales del mercado laboral, trimestre a trimestre.</p>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">3.4%</div>
+      <div class="stat-label">Tasa de desempleo I-2026</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num red">53.5%</div>
+      <div class="stat-label">Trabaja en sector informal</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num teal">35.7%</div>
+      <div class="stat-label">Empleo adecuado o pleno</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:#a8e063">18.4%</div>
+      <div class="stat-label">En situación de subempleo</div>
+    </div>
+  </div>
+  <div class="scroll-hint">Desplázate para explorar</div>
+</div>
+
+<!-- SECCIÓN 1: TENDENCIA -->
+<section class="fade-in">
+  <div class="section-label">01 · Tendencia temporal</div>
+  <div class="section-title">Cómo ha<br>evolucionado</div>
+  <p class="section-desc">Desde el pico de pandemia en el IV-2020 hasta hoy. El desempleo bajó, pero el subempleo y la informalidad se mantienen estructuralmente altos.</p>
+  <div class="chart-box">
+    <div class="chart-title">Tasas de empleo nacional por trimestre (%)</div>
+    <canvas id="chartTendencia" height="320"></canvas>
+  </div>
+  <div class="insight">
+    <p>El desempleo descendió del <strong>5.6% en IV-2020</strong> al <strong>3.4% en I-2026</strong>. Sin embargo el empleo adecuado nunca superó el 44%, lo que indica que la recuperación fue en cantidad de empleos, no necesariamente en calidad.</p>
+  </div>
+</section>
+
+<!-- SECCIÓN 2: BRECHA SEXO -->
+<section class="fade-in">
+  <div class="section-label">02 · Brecha de género</div>
+  <div class="section-title">Las mujeres<br>cargan más</div>
+  <p class="section-desc">En todos los trimestres registrados, las mujeres tienen casi el doble de desempleo que los hombres. Una brecha que no se cierra.</p>
+  <div class="brecha-grid">
+    <div class="brecha-card">
+      <div class="num" style="color:var(--accent3)">2.6%</div>
+      <div class="lbl">Desempleo · Hombres · I-2026</div>
+      <div class="sub">Tasa más baja registrada para hombres en el periodo analizado</div>
+    </div>
+    <div class="brecha-card">
+      <div class="num" style="color:var(--accent2)">4.6%</div>
+      <div class="lbl">Desempleo · Mujeres · I-2026</div>
+      <div class="sub">Las mujeres tienen 77% más probabilidad de estar desempleadas que los hombres</div>
+    </div>
+    <div class="brecha-card">
+      <div class="num" style="color:var(--accent)">+2.0pp</div>
+      <div class="lbl">Brecha estructural persistente</div>
+      <div class="sub">La diferencia no ha bajado de 1.5 puntos en ningún trimestre desde 2020</div>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-title">Tasa de desempleo por sexo · todos los trimestres (%)</div>
+    <canvas id="chartSexo" height="280"></canvas>
+  </div>
+</section>
+
+<!-- SECCIÓN 3: URBANO RURAL -->
+<section class="fade-in">
+  <div class="section-label">03 · Territorio</div>
+  <div class="section-title">Ciudad vs<br>campo</div>
+  <p class="section-desc">El desempleo urbano triplica al rural. Pero en el campo el subempleo y la informalidad son la norma, no la excepción.</p>
+  <div class="chart-box">
+    <div class="chart-title">Tasa de desempleo: Urbano vs Rural por trimestre (%)</div>
+    <canvas id="chartUrbanRural" height="280"></canvas>
+  </div>
+  <div class="insight">
+    <p>En I-2026 el desempleo urbano es <strong>4.5%</strong> versus <strong>1.1%</strong> rural. La diferencia no refleja mejor calidad de vida en el campo sino que la precariedad rural se expresa como subempleo e informalidad, no como desempleo abierto.</p>
+  </div>
+</section>
+
+<!-- SECCIÓN 4: CIUDADES -->
+<section class="fade-in">
+  <div class="section-label">04 · Ciudades principales</div>
+  <div class="section-title">Quito lidera<br>el desempleo</div>
+  <p class="section-desc">Entre las cinco ciudades principales hay disparidades significativas. Quito cuadruplica la tasa de Guayaquil en I-2026.</p>
+  <div class="chart-box" id="ciudadesWrap">
+    <div class="chart-title">Tasa de desempleo por ciudad · I-2026 (%)</div>
+    <div class="ciudad-bar-wrap" id="ciudadBars"></div>
+  </div>
+  <div class="insight">
+    <p><strong>Quito 8.9%</strong> lidera muy por encima de <strong>Guayaquil 2.3%</strong>. Esta diferencia refleja distintas estructuras económicas: Quito concentra empleo público y formal con mayor variabilidad, mientras Guayaquil tiene una economía más informal y comercial que absorbe más empleo, aunque de menor calidad.</p>
+  </div>
+</section>
+
+<!-- SECCIÓN 5: SECTORIZACION -->
+<section class="fade-in">
+  <div class="section-label">05 · Estructura del empleo</div>
+  <div class="section-title">Más de la mitad<br>en la informalidad</div>
+  <p class="section-desc">La sectorización revela la estructura real del mercado. El sector informal domina y muestra una tendencia creciente desde 2020.</p>
+  <div class="grid-2">
+    <div class="chart-box">
+      <div class="chart-title">Distribución del empleo · I-2026 (%)</div>
+      <div class="sector-donut-wrap">
+        <canvas id="chartDonut" width="200" height="200" style="max-width:200px;max-height:200px"></canvas>
+        <div class="sector-legend" id="sectorLegend"></div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Evolución formal vs informal (%)</div>
+      <canvas id="chartSector" height="240"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN 6: EDAD -->
+<section class="fade-in">
+  <div class="section-label">06 · Grupos de edad</div>
+  <div class="section-title">Los jóvenes,<br>los más golpeados</div>
+  <p class="section-desc">El desempleo juvenil (15-24 años) es entre 2 y 4 veces mayor que el de adultos en edad productiva.</p>
+  <div class="chart-box">
+    <div class="chart-title">Tasa de desempleo por grupo etario · todos los trimestres (%)</div>
+    <canvas id="chartEdad" height="300"></canvas>
+  </div>
+  <div class="insight">
+    <p>En I-2026 el desempleo entre <strong>15 y 24 años llega al 9.5%</strong>, más del triple que el grupo de 35 a 44 años (2.7%). Entrar al mercado laboral ecuatoriano siendo joven sigue siendo un obstáculo estructural.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="credits">
+    <strong>Fuente de datos</strong><br>
+    Encuesta Nacional de Empleo, Desempleo y Subempleo (ENEMDU)<br>
+    Instituto Nacional de Estadística y Censos — INEC · Ecuador<br>
+    Cobertura: IV-2020 a I-2026 · Datos expandidos con factores muestrales
+  </div>
+  <div class="credits" style="text-align:right">
+    <strong>Emilio Andrade</strong><br>
+    PUCE · C. Datos, Estudio de Casos<br>
+    Mayo 2026
+  </div>
+</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const DATA = {
+  tendencia: [{"trimestre_label":"IV-2020","anio":2020,"trimestre_num":4,"indicador":"Desempleo (%)","valor":5.6},{"trimestre_label":"IV-2020","anio":2020,"trimestre_num":4,"indicador":"Empleo Adecuado/Pleno (%)","valor":29.1},{"trimestre_label":"IV-2020","anio":2020,"trimestre_num":4,"indicador":"Subempleo (%)","valor":23.2},{"trimestre_label":"I-2021","anio":2021,"trimestre_num":1,"indicador":"Desempleo (%)","valor":5.4},{"trimestre_label":"I-2021","anio":2021,"trimestre_num":1,"indicador":"Empleo Adecuado/Pleno (%)","valor":29.1},{"trimestre_label":"I-2021","anio":2021,"trimestre_num":1,"indicador":"Subempleo (%)","valor":23.8},{"trimestre_label":"II-2021","anio":2021,"trimestre_num":2,"indicador":"Desempleo (%)","valor":5.5},{"trimestre_label":"II-2021","anio":2021,"trimestre_num":2,"indicador":"Empleo Adecuado/Pleno (%)","valor":32.0},{"trimestre_label":"II-2021","anio":2021,"trimestre_num":2,"indicador":"Subempleo (%)","valor":21.2},{"trimestre_label":"III-2021","anio":2021,"trimestre_num":3,"indicador":"Desempleo (%)","valor":5.1},{"trimestre_label":"III-2021","anio":2021,"trimestre_num":3,"indicador":"Empleo Adecuado/Pleno (%)","valor":32.2},{"trimestre_label":"III-2021","anio":2021,"trimestre_num":3,"indicador":"Subempleo (%)","valor":20.2},{"trimestre_label":"IV-2021","anio":2021,"trimestre_num":4,"indicador":"Desempleo (%)","valor":4.7},{"trimestre_label":"IV-2021","anio":2021,"trimestre_num":4,"indicador":"Empleo Adecuado/Pleno (%)","valor":32.9},{"trimestre_label":"IV-2021","anio":2021,"trimestre_num":4,"indicador":"Subempleo (%)","valor":20.3},{"trimestre_label":"I-2022","anio":2022,"trimestre_num":1,"indicador":"Desempleo (%)","valor":5.0},{"trimestre_label":"I-2022","anio":2022,"trimestre_num":1,"indicador":"Empleo Adecuado/Pleno (%)","valor":33.4},{"trimestre_label":"I-2022","anio":2022,"trimestre_num":1,"indicador":"Subempleo (%)","valor":20.0},{"trimestre_label":"II-2022","anio":2022,"trimestre_num":2,"indicador":"Desempleo (%)","valor":4.3},{"trimestre_label":"II-2022","anio":2022,"trimestre_num":2,"indicador":"Empleo Adecuado/Pleno (%)","valor":35.5},{"trimestre_label":"II-2022","anio":2022,"trimestre_num":2,"indicador":"Subempleo (%)","valor":18.5},{"trimestre_label":"III-2022","anio":2022,"trimestre_num":3,"indicador":"Desempleo (%)","valor":4.1},{"trimestre_label":"III-2022","anio":2022,"trimestre_num":3,"indicador":"Empleo Adecuado/Pleno (%)","valor":35.5},{"trimestre_label":"III-2022","anio":2022,"trimestre_num":3,"indicador":"Subempleo (%)","valor":18.3},{"trimestre_label":"IV-2022","anio":2022,"trimestre_num":4,"indicador":"Desempleo (%)","valor":3.8},{"trimestre_label":"IV-2022","anio":2022,"trimestre_num":4,"indicador":"Empleo Adecuado/Pleno (%)","valor":35.9},{"trimestre_label":"IV-2022","anio":2022,"trimestre_num":4,"indicador":"Subempleo (%)","valor":17.8},{"trimestre_label":"I-2023","anio":2023,"trimestre_num":1,"indicador":"Desempleo (%)","valor":3.8},{"trimestre_label":"I-2023","anio":2023,"trimestre_num":1,"indicador":"Empleo Adecuado/Pleno (%)","valor":34.1},{"trimestre_label":"I-2023","anio":2023,"trimestre_num":1,"indicador":"Subempleo (%)","valor":18.7},{"trimestre_label":"II-2023","anio":2023,"trimestre_num":2,"indicador":"Desempleo (%)","valor":3.8},{"trimestre_label":"II-2023","anio":2023,"trimestre_num":2,"indicador":"Empleo Adecuado/Pleno (%)","valor":36.2},{"trimestre_label":"II-2023","anio":2023,"trimestre_num":2,"indicador":"Subempleo (%)","valor":17.6},{"trimestre_label":"III-2023","anio":2023,"trimestre_num":3,"indicador":"Desempleo (%)","valor":3.8},{"trimestre_label":"III-2023","anio":2023,"trimestre_num":3,"indicador":"Empleo Adecuado/Pleno (%)","valor":35.1},{"trimestre_label":"III-2023","anio":2023,"trimestre_num":3,"indicador":"Subempleo (%)","valor":18.9},{"trimestre_label":"IV-2023","anio":2023,"trimestre_num":4,"indicador":"Desempleo (%)","valor":3.6},{"trimestre_label":"IV-2023","anio":2023,"trimestre_num":4,"indicador":"Empleo Adecuado/Pleno (%)","valor":34.4},{"trimestre_label":"IV-2023","anio":2023,"trimestre_num":4,"indicador":"Subempleo (%)","valor":19.4},{"trimestre_label":"I-2024","anio":2024,"trimestre_num":1,"indicador":"Desempleo (%)","valor":4.1},{"trimestre_label":"I-2024","anio":2024,"trimestre_num":1,"indicador":"Empleo Adecuado/Pleno (%)","valor":33.8},{"trimestre_label":"I-2024","anio":2024,"trimestre_num":1,"indicador":"Subempleo (%)","valor":19.4},{"trimestre_label":"II-2024","anio":2024,"trimestre_num":2,"indicador":"Desempleo (%)","valor":3.5},{"trimestre_label":"II-2024","anio":2024,"trimestre_num":2,"indicador":"Empleo Adecuado/Pleno (%)","valor":35.6},{"trimestre_label":"II-2024","anio":2024,"trimestre_num":2,"indicador":"Subempleo (%)","valor":18.2},{"trimestre_label":"III-2024","anio":2024,"trimestre_num":3,"indicador":"Desempleo (%)","valor":4.0},{"trimestre_label":"III-2024","anio":2024,"trimestre_num":3,"indicador":"Empleo Adecuado/Pleno (%)","valor":34.7},{"trimestre_label":"III-2024","anio":2024,"trimestre_num":3,"indicador":"Subempleo (%)","valor":19.4},{"trimestre_label":"IV-2024","anio":2024,"trimestre_num":4,"indicador":"Desempleo (%)","valor":3.4},{"trimestre_label":"IV-2024","anio":2024,"trimestre_num":4,"indicador":"Empleo Adecuado/Pleno (%)","valor":36.2},{"trimestre_label":"IV-2024","anio":2024,"trimestre_num":4,"indicador":"Subempleo (%)","valor":17.7},{"trimestre_label":"I-2025","anio":2025,"trimestre_num":1,"indicador":"Desempleo (%)","valor":3.8},{"trimestre_label":"I-2025","anio":2025,"trimestre_num":1,"indicador":"Empleo Adecuado/Pleno (%)","valor":35.6},{"trimestre_label":"I-2025","anio":2025,"trimestre_num":1,"indicador":"Subempleo (%)","valor":18.2},{"trimestre_label":"II-2025","anio":2025,"trimestre_num":2,"indicador":"Desempleo (%)","valor":3.9},{"trimestre_label":"II-2025","anio":2025,"trimestre_num":2,"indicador":"Empleo Adecuado/Pleno (%)","valor":36.5},{"trimestre_label":"II-2025","anio":2025,"trimestre_num":2,"indicador":"Subempleo (%)","valor":17.8},{"trimestre_label":"III-2025","anio":2025,"trimestre_num":3,"indicador":"Desempleo (%)","valor":3.6},{"trimestre_label":"III-2025","anio":2025,"trimestre_num":3,"indicador":"Empleo Adecuado/Pleno (%)","valor":36.6},{"trimestre_label":"III-2025","anio":2025,"trimestre_num":3,"indicador":"Subempleo (%)","valor":17.9},{"trimestre_label":"IV-2025","anio":2025,"trimestre_num":4,"indicador":"Desempleo (%)","valor":3.1},{"trimestre_label":"IV-2025","anio":2025,"trimestre_num":4,"indicador":"Empleo Adecuado/Pleno (%)","valor":37.5},{"trimestre_label":"IV-2025","anio":2025,"trimestre_num":4,"indicador":"Subempleo (%)","valor":17.1},{"trimestre_label":"I-2026","anio":2026,"trimestre_num":1,"indicador":"Desempleo (%)","valor":3.4},{"trimestre_label":"I-2026","anio":2026,"trimestre_num":1,"indicador":"Empleo Adecuado/Pleno (%)","valor":35.7},{"trimestre_label":"I-2026","anio":2026,"trimestre_num":1,"indicador":"Subempleo (%)","valor":18.4}],
+  sexo: [{"trimestre_label":"IV-2020","anio":2020,"trimestre_num":4,"sexo":"Hombre","valor":4.6},{"trimestre_label":"IV-2020","anio":2020,"trimestre_num":4,"sexo":"Mujer","valor":7.1},{"trimestre_label":"I-2021","anio":2021,"trimestre_num":1,"sexo":"Hombre","valor":4.4},{"trimestre_label":"I-2021","anio":2021,"trimestre_num":1,"sexo":"Mujer","valor":6.9},{"trimestre_label":"II-2021","anio":2021,"trimestre_num":2,"sexo":"Hombre","valor":4.3},{"trimestre_label":"II-2021","anio":2021,"trimestre_num":2,"sexo":"Mujer","valor":7.1},{"trimestre_label":"III-2021","anio":2021,"trimestre_num":3,"sexo":"Hombre","valor":4.0},{"trimestre_label":"III-2021","anio":2021,"trimestre_num":3,"sexo":"Mujer","valor":6.5},{"trimestre_label":"IV-2021","anio":2021,"trimestre_num":4,"sexo":"Hombre","valor":3.7},{"trimestre_label":"IV-2021","anio":2021,"trimestre_num":4,"sexo":"Mujer","valor":6.0},{"trimestre_label":"I-2022","anio":2022,"trimestre_num":1,"sexo":"Hombre","valor":3.9},{"trimestre_label":"I-2022","anio":2022,"trimestre_num":1,"sexo":"Mujer","valor":6.4},{"trimestre_label":"II-2022","anio":2022,"trimestre_num":2,"sexo":"Hombre","valor":3.4},{"trimestre_label":"II-2022","anio":2022,"trimestre_num":2,"sexo":"Mujer","valor":5.5},{"trimestre_label":"III-2022","anio":2022,"trimestre_num":3,"sexo":"Hombre","valor":3.3},{"trimestre_label":"III-2022","anio":2022,"trimestre_num":3,"sexo":"Mujer","valor":5.1},{"trimestre_label":"IV-2022","anio":2022,"trimestre_num":4,"sexo":"Hombre","valor":3.0},{"trimestre_label":"IV-2022","anio":2022,"trimestre_num":4,"sexo":"Mujer","valor":4.8},{"trimestre_label":"I-2023","anio":2023,"trimestre_num":1,"sexo":"Hombre","valor":2.9},{"trimestre_label":"I-2023","anio":2023,"trimestre_num":1,"sexo":"Mujer","valor":4.9},{"trimestre_label":"II-2023","anio":2023,"trimestre_num":2,"sexo":"Hombre","valor":3.0},{"trimestre_label":"II-2023","anio":2023,"trimestre_num":2,"sexo":"Mujer","valor":4.8},{"trimestre_label":"III-2023","anio":2023,"trimestre_num":3,"sexo":"Hombre","valor":3.0},{"trimestre_label":"III-2023","anio":2023,"trimestre_num":3,"sexo":"Mujer","valor":4.8},{"trimestre_label":"IV-2023","anio":2023,"trimestre_num":4,"sexo":"Hombre","valor":2.8},{"trimestre_label":"IV-2023","anio":2023,"trimestre_num":4,"sexo":"Mujer","valor":4.5},{"trimestre_label":"I-2024","anio":2024,"trimestre_num":1,"sexo":"Hombre","valor":3.3},{"trimestre_label":"I-2024","anio":2024,"trimestre_num":1,"sexo":"Mujer","valor":5.1},{"trimestre_label":"II-2024","anio":2024,"trimestre_num":2,"sexo":"Hombre","valor":2.7},{"trimestre_label":"II-2024","anio":2024,"trimestre_num":2,"sexo":"Mujer","valor":4.5},{"trimestre_label":"III-2024","anio":2024,"trimestre_num":3,"sexo":"Hombre","valor":3.3},{"trimestre_label":"III-2024","anio":2024,"trimestre_num":3,"sexo":"Mujer","valor":4.9},{"trimestre_label":"IV-2024","anio":2024,"trimestre_num":4,"sexo":"Hombre","valor":2.7},{"trimestre_label":"IV-2024","anio":2024,"trimestre_num":4,"sexo":"Mujer","valor":4.2},{"trimestre_label":"I-2025","anio":2025,"trimestre_num":1,"sexo":"Hombre","valor":2.9},{"trimestre_label":"I-2025","anio":2025,"trimestre_num":1,"sexo":"Mujer","valor":5.0},{"trimestre_label":"II-2025","anio":2025,"trimestre_num":2,"sexo":"Hombre","valor":3.0},{"trimestre_label":"II-2025","anio":2025,"trimestre_num":2,"sexo":"Mujer","valor":5.0},{"trimestre_label":"III-2025","anio":2025,"trimestre_num":3,"sexo":"Hombre","valor":2.7},{"trimestre_label":"III-2025","anio":2025,"trimestre_num":3,"sexo":"Mujer","valor":4.7},{"trimestre_label":"IV-2025","anio":2025,"trimestre_num":4,"sexo":"Hombre","valor":2.4},{"trimestre_label":"IV-2025","anio":2025,"trimestre_num":4,"sexo":"Mujer","valor":4.1},{"trimestre_label":"I-2026","anio":2026,"trimestre_num":1,"sexo":"Hombre","valor":2.6},{"trimestre_label":"I-2026","anio":2026,"trimestre_num":1,"sexo":"Mujer","valor":4.6}],
+  urbano_rural: [{"trimestre_label":"IV-2020","valor":7.4,"area":"Urbana"},{"trimestre_label":"IV-2020","valor":2.2,"area":"Rural"},{"trimestre_label":"I-2021","valor":7.0,"area":"Urbana"},{"trimestre_label":"I-2021","valor":2.1,"area":"Rural"},{"trimestre_label":"II-2021","valor":7.1,"area":"Urbana"},{"trimestre_label":"II-2021","valor":2.4,"area":"Rural"},{"trimestre_label":"III-2021","valor":6.5,"area":"Urbana"},{"trimestre_label":"III-2021","valor":2.1,"area":"Rural"},{"trimestre_label":"IV-2021","valor":5.9,"area":"Urbana"},{"trimestre_label":"IV-2021","valor":2.1,"area":"Rural"},{"trimestre_label":"I-2022","valor":6.3,"area":"Urbana"},{"trimestre_label":"I-2022","valor":1.9,"area":"Rural"},{"trimestre_label":"II-2022","valor":5.4,"area":"Urbana"},{"trimestre_label":"II-2022","valor":1.8,"area":"Rural"},{"trimestre_label":"III-2022","valor":5.2,"area":"Urbana"},{"trimestre_label":"III-2022","valor":1.6,"area":"Rural"},{"trimestre_label":"IV-2022","valor":4.7,"area":"Urbana"},{"trimestre_label":"IV-2022","valor":1.5,"area":"Rural"},{"trimestre_label":"I-2023","valor":4.8,"area":"Urbana"},{"trimestre_label":"I-2023","valor":1.4,"area":"Rural"},{"trimestre_label":"II-2023","valor":4.7,"area":"Urbana"},{"trimestre_label":"II-2023","valor":1.6,"area":"Rural"},{"trimestre_label":"III-2023","valor":4.8,"area":"Urbana"},{"trimestre_label":"III-2023","valor":1.4,"area":"Rural"},{"trimestre_label":"IV-2023","valor":4.5,"area":"Urbana"},{"trimestre_label":"IV-2023","valor":1.3,"area":"Rural"},{"trimestre_label":"I-2024","valor":5.1,"area":"Urbana"},{"trimestre_label":"I-2024","valor":1.5,"area":"Rural"},{"trimestre_label":"II-2024","valor":4.4,"area":"Urbana"},{"trimestre_label":"II-2024","valor":1.2,"area":"Rural"},{"trimestre_label":"III-2024","valor":5.1,"area":"Urbana"},{"trimestre_label":"III-2024","valor":1.4,"area":"Rural"},{"trimestre_label":"IV-2024","valor":4.3,"area":"Urbana"},{"trimestre_label":"IV-2024","valor":1.1,"area":"Rural"},{"trimestre_label":"I-2025","valor":4.7,"area":"Urbana"},{"trimestre_label":"I-2025","valor":1.4,"area":"Rural"},{"trimestre_label":"II-2025","valor":4.9,"area":"Urbana"},{"trimestre_label":"II-2025","valor":1.4,"area":"Rural"},{"trimestre_label":"III-2025","valor":4.5,"area":"Urbana"},{"trimestre_label":"III-2025","valor":1.3,"area":"Rural"},{"trimestre_label":"IV-2025","valor":3.8,"area":"Urbana"},{"trimestre_label":"IV-2025","valor":1.1,"area":"Rural"},{"trimestre_label":"I-2026","valor":4.5,"area":"Urbana"},{"trimestre_label":"I-2026","valor":1.1,"area":"Rural"}],
+  ciudades: [{"ciudad":"Quito","valor":8.9},{"ciudad":"Guayaquil","valor":2.3},{"ciudad":"Cuenca","valor":4.0},{"ciudad":"Machala","valor":3.8},{"ciudad":"Ambato","valor":3.7}],
+  sectorizacion: [{"trimestre_label":"IV-2020","sector":"Sector Formal","valor_pct":42.4},{"trimestre_label":"IV-2020","sector":"Sector Informal","valor_pct":51.6},{"trimestre_label":"I-2021","sector":"Sector Formal","valor_pct":42.3},{"trimestre_label":"I-2021","sector":"Sector Informal","valor_pct":50.1},{"trimestre_label":"II-2021","sector":"Sector Formal","valor_pct":40.9},{"trimestre_label":"II-2021","sector":"Sector Informal","valor_pct":51.6},{"trimestre_label":"III-2021","sector":"Sector Formal","valor_pct":42.3},{"trimestre_label":"III-2021","sector":"Sector Informal","valor_pct":50.0},{"trimestre_label":"IV-2021","sector":"Sector Formal","valor_pct":43.5},{"trimestre_label":"IV-2021","sector":"Sector Informal","valor_pct":50.2},{"trimestre_label":"I-2022","sector":"Sector Formal","valor_pct":43.6},{"trimestre_label":"I-2022","sector":"Sector Informal","valor_pct":51.1},{"trimestre_label":"II-2022","sector":"Sector Formal","valor_pct":43.7},{"trimestre_label":"II-2022","sector":"Sector Informal","valor_pct":50.6},{"trimestre_label":"III-2022","sector":"Sector Formal","valor_pct":44.2},{"trimestre_label":"III-2022","sector":"Sector Informal","valor_pct":51.3},{"trimestre_label":"IV-2022","sector":"Sector Formal","valor_pct":43.9},{"trimestre_label":"IV-2022","sector":"Sector Informal","valor_pct":51.8},{"trimestre_label":"I-2023","sector":"Sector Formal","valor_pct":42.5},{"trimestre_label":"I-2023","sector":"Sector Informal","valor_pct":53.5},{"trimestre_label":"II-2023","sector":"Sector Formal","valor_pct":44.1},{"trimestre_label":"II-2023","sector":"Sector Informal","valor_pct":52.1},{"trimestre_label":"III-2023","sector":"Sector Formal","valor_pct":43.2},{"trimestre_label":"III-2023","sector":"Sector Informal","valor_pct":53.2},{"trimestre_label":"IV-2023","sector":"Sector Formal","valor_pct":42.7},{"trimestre_label":"IV-2023","sector":"Sector Informal","valor_pct":54.0},{"trimestre_label":"I-2024","sector":"Sector Formal","valor_pct":42.5},{"trimestre_label":"I-2024","sector":"Sector Informal","valor_pct":54.2},{"trimestre_label":"II-2024","sector":"Sector Formal","valor_pct":43.7},{"trimestre_label":"II-2024","sector":"Sector Informal","valor_pct":52.5},{"trimestre_label":"III-2024","sector":"Sector Formal","valor_pct":42.6},{"trimestre_label":"III-2024","sector":"Sector Informal","valor_pct":53.9},{"trimestre_label":"IV-2024","sector":"Sector Formal","valor_pct":41.2},{"trimestre_label":"IV-2024","sector":"Sector Informal","valor_pct":55.2},{"trimestre_label":"I-2025","sector":"Sector Formal","valor_pct":42.5},{"trimestre_label":"I-2025","sector":"Sector Informal","valor_pct":53.5},{"trimestre_label":"II-2025","sector":"Sector Formal","valor_pct":43.1},{"trimestre_label":"II-2025","sector":"Sector Informal","valor_pct":52.6},{"trimestre_label":"III-2025","sector":"Sector Formal","valor_pct":43.4},{"trimestre_label":"III-2025","sector":"Sector Informal","valor_pct":52.4},{"trimestre_label":"IV-2025","sector":"Sector Formal","valor_pct":42.2},{"trimestre_label":"IV-2025","sector":"Sector Informal","valor_pct":53.8},{"trimestre_label":"I-2026","sector":"Sector Formal","valor_pct":42.2},{"trimestre_label":"I-2026","sector":"Sector Informal","valor_pct":53.5}],
+  edad: [{"trimestre_label":"IV-2020","grupo_edad":"Entre 15 y 24 años","valor":12.2},{"trimestre_label":"IV-2020","grupo_edad":"Entre 25 y 34 años","valor":6.4},{"trimestre_label":"IV-2020","grupo_edad":"Entre 35 y 44 años","valor":4.1},{"trimestre_label":"IV-2020","grupo_edad":"Entre 45 y 64 años","valor":3.4},{"trimestre_label":"IV-2020","grupo_edad":"65 años y más","valor":2.1},{"trimestre_label":"I-2021","grupo_edad":"Entre 15 y 24 años","valor":11.5},{"trimestre_label":"I-2021","grupo_edad":"Entre 25 y 34 años","valor":6.3},{"trimestre_label":"I-2021","grupo_edad":"Entre 35 y 44 años","valor":3.9},{"trimestre_label":"I-2021","grupo_edad":"Entre 45 y 64 años","valor":3.1},{"trimestre_label":"I-2021","grupo_edad":"65 años y más","valor":2.0},{"trimestre_label":"II-2021","grupo_edad":"Entre 15 y 24 años","valor":11.8},{"trimestre_label":"II-2021","grupo_edad":"Entre 25 y 34 años","valor":6.5},{"trimestre_label":"II-2021","grupo_edad":"Entre 35 y 44 años","valor":4.0},{"trimestre_label":"II-2021","grupo_edad":"Entre 45 y 64 años","valor":3.0},{"trimestre_label":"II-2021","grupo_edad":"65 años y más","valor":2.2},{"trimestre_label":"I-2026","grupo_edad":"Entre 15 y 24 años","valor":9.5},{"trimestre_label":"I-2026","grupo_edad":"Entre 25 y 34 años","valor":3.9},{"trimestre_label":"I-2026","grupo_edad":"Entre 35 y 44 años","valor":2.7},{"trimestre_label":"I-2026","grupo_edad":"Entre 45 y 64 años","valor":2.1},{"trimestre_label":"I-2026","grupo_edad":"65 años y más","valor":1.1}]
+};
+
+// ── CHART DEFAULTS ────────────────────────────────────────────────────────────
+Chart.defaults.color = '#666';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+
+const gridOpts = {
+  color: 'rgba(255,255,255,0.04)',
+  drawBorder: false,
+};
+const tickOpts = { color: '#555', maxTicksLimit: 8 };
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function getLabels(data, key) {
+  return [...new Set(data.map(d => d[key]))];
+}
+function filterSeries(data, key, val) {
+  return data.filter(d => d[key] === val).map(d => d.valor ?? d.valor_pct);
+}
+
+// ── 1. TENDENCIA ──────────────────────────────────────────────────────────────
+(function() {
+  const labels = getLabels(DATA.tendencia.filter(d=>d.indicador==='Desempleo (%)'), 'trimestre_label');
+  new Chart(document.getElementById('chartTendencia'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Desempleo', data: filterSeries(DATA.tendencia.filter(d=>d.indicador==='Desempleo (%)'), 'trimestre_label', null).length ? DATA.tendencia.filter(d=>d.indicador==='Desempleo (%)').map(d=>d.valor) : [],
+          borderColor: '#e8392a', backgroundColor: 'rgba(232,57,42,0.08)', tension: 0.4, borderWidth: 2, pointRadius: 0, fill: true },
+        { label: 'Empleo Adecuado', data: DATA.tendencia.filter(d=>d.indicador==='Empleo Adecuado/Pleno (%)').map(d=>d.valor),
+          borderColor: '#4ecdc4', backgroundColor: 'rgba(78,205,196,0.06)', tension: 0.4, borderWidth: 2, pointRadius: 0, fill: true },
+        { label: 'Subempleo', data: DATA.tendencia.filter(d=>d.indicador==='Subempleo (%)').map(d=>d.valor),
+          borderColor: '#f5a623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, borderWidth: 2, pointRadius: 0, fill: true },
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { boxWidth: 8, padding: 20, color: '#888' } }, tooltip: { backgroundColor: '#111', borderColor: '#333', borderWidth: 1 } },
+      scales: {
+        x: { grid: gridOpts, ticks: { ...tickOpts, maxTicksLimit: 11 } },
+        y: { grid: gridOpts, ticks: tickOpts, min: 0, max: 50 }
+      }
+    }
+  });
+})();
+
+// ── 2. SEXO ───────────────────────────────────────────────────────────────────
+(function() {
+  const labels = [...new Set(DATA.sexo.map(d => d.trimestre_label))];
+  new Chart(document.getElementById('chartSexo'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Hombre', data: DATA.sexo.filter(d=>d.sexo==='Hombre').map(d=>d.valor),
+          borderColor: '#4ecdc4', tension: 0.4, borderWidth: 2, pointRadius: 0 },
+        { label: 'Mujer', data: DATA.sexo.filter(d=>d.sexo==='Mujer').map(d=>d.valor),
+          borderColor: '#e8392a', tension: 0.4, borderWidth: 2, pointRadius: 0 },
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { boxWidth: 8, padding: 20, color: '#888' } }, tooltip: { backgroundColor: '#111', borderColor: '#333', borderWidth: 1 } },
+      scales: {
+        x: { grid: gridOpts, ticks: { ...tickOpts, maxTicksLimit: 11 } },
+        y: { grid: gridOpts, ticks: tickOpts, min: 0 }
+      }
+    }
+  });
+})();
+
+// ── 3. URBANO / RURAL ─────────────────────────────────────────────────────────
+(function() {
+  const labels = [...new Set(DATA.urbano_rural.map(d => d.trimestre_label))];
+  new Chart(document.getElementById('chartUrbanRural'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Urbana', data: DATA.urbano_rural.filter(d=>d.area==='Urbana').map(d=>d.valor),
+          backgroundColor: 'rgba(245,166,35,0.7)', borderRadius: 2 },
+        { label: 'Rural', data: DATA.urbano_rural.filter(d=>d.area==='Rural').map(d=>d.valor),
+          backgroundColor: 'rgba(78,205,196,0.5)', borderRadius: 2 },
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { boxWidth: 8, padding: 20, color: '#888' } }, tooltip: { backgroundColor: '#111', borderColor: '#333', borderWidth: 1 } },
+      scales: {
+        x: { grid: gridOpts, ticks: { ...tickOpts, maxTicksLimit: 11 }, stacked: false },
+        y: { grid: gridOpts, ticks: tickOpts, min: 0 }
+      }
+    }
+  });
+})();
+
+// ── 4. CIUDADES ───────────────────────────────────────────────────────────────
+(function() {
+  const max = Math.max(...DATA.ciudades.map(d=>d.valor));
+  const wrap = document.getElementById('ciudadBars');
+  DATA.ciudades.sort((a,b)=>b.valor-a.valor).forEach(c => {
+    const pct = (c.valor / max * 100).toFixed(1);
+    const isHigh = c.valor >= 7;
+    wrap.innerHTML += `
+      <div class="ciudad-row">
+        <div class="ciudad-name">${c.ciudad}</div>
+        <div class="ciudad-bar-bg">
+          <div class="ciudad-bar-fill ${isHigh?'high':''}" style="width:${pct}%"></div>
+        </div>
+        <div class="ciudad-val">${c.valor}%</div>
+      </div>`;
+  });
+})();
+
+// ── 5. SECTORIZACION ─────────────────────────────────────────────────────────
+(function() {
+  const donutData = [53.5, 42.2, 2.4, 1.9];
+  const donutLabels = ['Informal', 'Formal', 'Doméstico', 'No clasificado'];
+  const donutColors = ['#e8392a', '#4ecdc4', '#f5a623', '#555'];
+
+  new Chart(document.getElementById('chartDonut'), {
+    type: 'doughnut',
+    data: {
+      labels: donutLabels,
+      datasets: [{ data: donutData, backgroundColor: donutColors, borderWidth: 0, hoverOffset: 4 }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#111', borderColor: '#333', borderWidth: 1 } }
+    }
+  });
+
+  const legend = document.getElementById('sectorLegend');
+  donutLabels.forEach((l,i) => {
+    legend.innerHTML += `<div class="legend-row">
+      <div class="legend-dot" style="background:${donutColors[i]}"></div>
+      <div class="legend-text">${l}</div>
+      <div class="legend-pct">${donutData[i]}%</div>
+    </div>`;
+  });
+
+  const labels = [...new Set(DATA.sectorizacion.map(d=>d.trimestre_label))];
+  new Chart(document.getElementById('chartSector'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Formal', data: DATA.sectorizacion.filter(d=>d.sector==='Sector Formal').map(d=>d.valor_pct),
+          borderColor: '#4ecdc4', tension: 0.4, borderWidth: 2, pointRadius: 0 },
+        { label: 'Informal', data: DATA.sectorizacion.filter(d=>d.sector==='Sector Informal').map(d=>d.valor_pct),
+          borderColor: '#e8392a', tension: 0.4, borderWidth: 2, pointRadius: 0 },
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { boxWidth: 8, padding: 20, color: '#888' } }, tooltip: { backgroundColor: '#111', borderColor: '#333', borderWidth: 1 } },
+      scales: {
+        x: { grid: gridOpts, ticks: { ...tickOpts, maxTicksLimit: 11 } },
+        y: { grid: gridOpts, ticks: tickOpts, min: 35, max: 60 }
+      }
+    }
+  });
+})();
+
+// ── 6. EDAD ───────────────────────────────────────────────────────────────────
+(function() {
+  const grupos = ['Entre 15 y 24 años','Entre 25 y 34 años','Entre 35 y 44 años','Entre 45 y 64 años','65 años y más'];
+  const colores = ['#e8392a','#f5a623','#4ecdc4','#a8e063','#666'];
+  const periodos = [...new Set(DATA.edad.map(d=>d.trimestre_label))];
+  new Chart(document.getElementById('chartEdad'), {
+    type: 'line',
+    data: {
+      labels: periodos,
+      datasets: grupos.map((g,i) => ({
+        label: g,
+        data: DATA.edad.filter(d=>d.grupo_edad===g).map(d=>d.valor),
+        borderColor: colores[i],
+        tension: 0.4, borderWidth: 2, pointRadius: 0
+      }))
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { boxWidth: 8, padding: 16, color: '#888' } }, tooltip: { backgroundColor: '#111', borderColor: '#333', borderWidth: 1 } },
+      scales: {
+        x: { grid: gridOpts, ticks: tickOpts },
+        y: { grid: gridOpts, ticks: tickOpts, min: 0 }
+      }
+    }
+  });
+})();
+
+// ── SCROLL FADE IN ────────────────────────────────────────────────────────────
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
