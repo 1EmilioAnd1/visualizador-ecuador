@@ -1,1 +1,0 @@
-# visualizador-ecuador
